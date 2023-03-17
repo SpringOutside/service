@@ -61,13 +61,23 @@ public class StudentServiceImpl implements StudentService {
         catalogRepository.save(catalog);
     }
 
-    public List<SubjectGradeDto> getGradesByStudentId(String studentId) {
-        Optional<StudentEntity> student = studentRepository.findById(studentId);
-        CatalogEntity catalog = new CatalogEntity();
-        if (student.isPresent()) {
-            catalog = catalogRepository.findByStudent(student.get());
-        }
+    public List<SubjectGradeDto> getGradesByStudentId(String studentId) throws IllegalArgumentException {
+        try {
 
-        return catalog.getGrades();
+            if (studentId == null || studentId.isEmpty()) {
+                throw new IllegalArgumentException("Student ID cannot be null or empty");
+            }
+
+            Optional<StudentEntity> student = studentRepository.findById(studentId);
+            CatalogEntity catalog = new CatalogEntity();
+            if (student.isPresent()) {
+                catalog = catalogRepository.findByStudent(student.get());
+            }
+
+            return catalog.getGrades();
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+            throw new IllegalArgumentException("An error occurred while getting grades for student with ID " + studentId + ".", ex);
+        }
     }
 }
