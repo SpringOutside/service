@@ -9,6 +9,8 @@ import com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.impl.clas
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.ContentType;
 import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.io.entity.StringEntity;
 import org.bson.types.ObjectId;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 
@@ -44,13 +46,8 @@ public class TeacherControllerTestIT {
     public ModelMapper modelMapper;
 
 
-    @Before
-    public void setup() {
-        teacherRepository.deleteAll();
-    }
-
     @Test
-    public void test_update_teacher_controller() throws IOException {
+    public void test_update_teacher_controller() throws IOException, JSONException {
 
 
         TeacherDto newTeacher = new TeacherDto();
@@ -58,17 +55,16 @@ public class TeacherControllerTestIT {
         newTeacher.setLastName("Vlaicu");
         newTeacher.setSubject("matematica");
 
-
         TeacherEntity teacherEntity = modelMapper.map(newTeacher, TeacherEntity.class);
-        teacherEntity.setId(new ObjectId().toString());
+        teacherEntity = teacherRepository.save(teacherEntity);
 
         String id = teacherEntity.getId();
 
-        teacherRepository.save(teacherEntity);
+        JSONObject json = new JSONObject();
+        json.put("firstName", "AurelUpdatat");
 
-
-        HttpUriRequest request = new HttpPatch( createURLWithPort("/"+id + "/teacher"));
-        StringEntity entity = new StringEntity(new ObjectMapper().writeValueAsString(teacherEntity), ContentType.APPLICATION_JSON);
+        HttpUriRequest request = new HttpPatch( createURLWithPort("/"+id+ "/teacher"));
+        StringEntity entity = new StringEntity(json.toString(), ContentType.APPLICATION_JSON);
         request.setEntity(entity);
 
 
@@ -78,6 +74,15 @@ public class TeacherControllerTestIT {
 
         int statusCode = httpResponse.getCode();
         Assertions.assertEquals(HttpStatus.OK.value(), statusCode);
+
+        teacherEntity = teacherRepository.findByFirstNameAndLastName("AurelUpdatat", "Vlaicu");
+
+        if (teacherEntity != null) {
+            teacherRepository.delete(teacherEntity);
+        }
+
+        Assertions.assertNotNull(teacherEntity);
+
     }
 
     private String createURLWithPort(String uri) {
