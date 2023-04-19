@@ -11,6 +11,11 @@ pipeline {
                 sh './gradlew clean build'
             }
         }
+         stage("Run the integration tests"){
+            steps{
+                sh "./gradlew testE2E"
+            }
+         }
         stage('Tag image') {
                   steps {
                     script {
@@ -30,11 +35,7 @@ pipeline {
                     sh "IMAGE_TAG=${env.IMAGE_TAG} docker compose up -d hello"
             }
          }
-         stage("Run the integration tests"){
-            steps{
-                sh "./gradlew testE2E"
-            }
-         }
+
     }
 
 }
