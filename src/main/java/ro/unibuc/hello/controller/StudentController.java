@@ -31,7 +31,7 @@ public class StudentController {
 
     @PostMapping("/student")
     @Timed(value = "hello.addstudent.time", description = "Time taken to add student")
-    @Counted(value = "hello.addstudent.count", description = "Times addStudent was returned")
+    @Counted(value = "hello.addstudent.count", description = "Times addStudent")
     public ResponseEntity<ResponseDto> addStudent(@RequestBody StudentDto dto) {
         StudentEntity student = studentService.addStudent(dto);
         if (student == null) {
