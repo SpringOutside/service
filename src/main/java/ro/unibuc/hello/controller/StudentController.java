@@ -39,6 +39,8 @@ public class StudentController {
     }
 
     @PostMapping("/add-grade")
+    @Timed(value = "hello.addstudentgrades.time", description = "Time taken to add grades from student")
+    @Counted(value = "hello.addstudentgrades.count", description = "Times addStudentGrades was returned")
     public ResponseEntity<ResponseDto> addGrade(@RequestBody StudentGradeDto dto) {
         try {
             return ResponseEntity.ok(studentService.addGrade(dto));
